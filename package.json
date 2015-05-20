@@ -1,0 +1,13 @@
+{
+  "name": "qualcomm-lucymcrae",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "dependencies": {
+    "express": "^4.12.4",
+    "mongodb": "^2.0.33"
+  }
+}
