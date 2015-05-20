@@ -1,21 +1,32 @@
 var MongoClient = require('mongodb').MongoClient;
+var bodyParser = require('body-parser');
 var express = require('express');
 var app = express();
 
-var recordings;
+var data;
 
 app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+function add(obj, res) {
+  console.log(obj);
+  data.insert(obj, function(err, result) {
+    res.sendStatus(err ? 500 : 200);
+  })
+}
 
 app.get('/add', function (req, res) {
-  var record = req.query;
-  recordings.insert(req.query, function(err, result) {
-    res.status(err ? 500 : 200).end();
-  })
+  add(req.query, res);
+});
+
+app.post('/add', function (req, res) {
+  add(req.body, res);
 });
 
 app.get('/get', function (req, res) {
-  recordings.find().toArray(function(err, items) {
-    if(err) return res.status(500).end();
+  data.find().toArray(function(err, items) {
+    if(err) return res.sendStatus(500);
     res.json(items);
   });
 });
@@ -23,7 +34,7 @@ app.get('/get', function (req, res) {
 MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
   if(err) { return console.dir(err); }
   console.log('Connected to database.');
-  recordings = db.collection('recordings');
+  data = db.collection('data');
 
   var server = app.listen(process.env.PORT, function () {
     var host = server.address().address;
