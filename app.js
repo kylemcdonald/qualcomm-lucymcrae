@@ -20,12 +20,12 @@ app.get('/get', function (req, res) {
   });
 });
 
-MongoClient.connect("mongodb://admin:password@ds031882.mongolab.com:31882/heroku_app37033278", function(err, db) {
+MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
   if(err) { return console.dir(err); }
   console.log('Connected to database.');
   recordings = db.collection('recordings');
 
-  var server = app.listen(3000, function () {
+  var server = app.listen(process.env.PORT, function () {
     var host = server.address().address;
     var port = server.address().port;
     console.log('Listening at http://%s:%s', host, port);
