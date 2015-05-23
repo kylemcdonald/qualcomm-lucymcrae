@@ -51,7 +51,11 @@ app.get('/get/raw', function (req, res) {
 });
 
 app.get('/get/data', function (req, res) {
-  dataCollection.find().toArray(function(err, items) {
+  var query = {};
+  if(req.query.serial) {
+    query.serial = req.query.serial;
+  }
+  dataCollection.find(query).toArray(function(err, items) {
     if(err) return res.sendStatus(500);
     res.json(items);
   });
