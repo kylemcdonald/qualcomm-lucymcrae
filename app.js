@@ -20,11 +20,12 @@ io.on('connection', function (socket) {
 
 function add(raw, res) {
   console.log(raw);
+  var qcl_json_data = JSON.parse(raw.qcl_json_data);
   var data = {
     serial: raw.device_serial_number,
     time: raw.hub_receive_time,
-    spo2: raw.qcl_json_data.records[0].spO2.value,
-    hr: raw.qcl_json_data.records[0].pulseRate.value
+    spo2: qcl_json_data.records[0].spO2.value,
+    hr: qcl_json_data.records[0].pulseRate.value
   }
   dataCollection.insert(data, function(err1, result) {
     rawCollection.insert(raw, function(err2, result) {
