@@ -1,5 +1,6 @@
 var MongoClient = require('mongodb').MongoClient;
 var bodyParser = require('body-parser');
+var cors = require('cors');
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);
@@ -7,6 +8,7 @@ var io = require('socket.io')(server);
 
 var rawCollection, dataCollection;
 
+app.use(cors());
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
