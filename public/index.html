@@ -1,1 +1,18 @@
-hi
+<html>
+<head>
+<script src="./socket.io/socket.io.js"></script>
+</head>
+<body>
+<script>
+var socket = io.connect();
+socket.on('status', function (data) {
+  console.log(data);
+  socket.emit('status', { client: location.href });
+});
+socket.on('update', function (data) {
+  console.log('update');
+  console.log(data);
+});
+</script>
+</body>
+</html>
