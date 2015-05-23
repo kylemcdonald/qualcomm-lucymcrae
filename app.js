@@ -30,7 +30,7 @@ function add(raw, res) {
   dataCollection.insert(data, function(err1, result) {
     rawCollection.insert(raw, function(err2, result) {
       res.sendStatus((err1 || err2) ? 500 : 200);
-      io.sockets.emit('update', obj);     
+      io.sockets.emit('update', data);     
     })
   })
 }
