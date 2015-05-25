@@ -57,7 +57,10 @@ app.get('/get/data', function (req, res) {
   if(req.query.serial) {
     query.serial = req.query.serial;
   }
-  dataCollection.find(query).toArray(function(err, items) {
+  var order = {'_id': -1};
+  dataCollection.find(query)
+    .sort(order)
+    .toArray(function(err, items) {
     if(err) return res.sendStatus(500);
     res.json(items);
   });
