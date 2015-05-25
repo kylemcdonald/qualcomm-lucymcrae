@@ -53,6 +53,7 @@ app.get('/get/raw', function (req, res) {
 });
 
 app.get('/get/data', function (req, res) {
+  var limit = req.query.limit;
   var query = {};
   if(req.query.serial) {
     query.serial = req.query.serial;
@@ -62,6 +63,9 @@ app.get('/get/data', function (req, res) {
     .sort(order)
     .toArray(function(err, items) {
     if(err) return res.sendStatus(500);
+    if(limit) {
+      items = items.slice(0, limit);
+    }
     res.json(items);
   });
 });
