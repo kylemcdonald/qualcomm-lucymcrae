@@ -12,8 +12,8 @@ var rawCollection,
 
 app.use(cors());
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 io.on('connection', function (socket) {
   socket.emit('status', { server: __filename });
