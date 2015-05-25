@@ -27,7 +27,7 @@ function add(raw, res) {
   var qcl_json_data = JSON.parse(raw.qcl_json_data);
   var data = {
     serial: raw.device_serial_number,
-    time: raw.hub_receive_time,
+    time: raw.hub_receive_time + 'Z',
     spo2: qcl_json_data.records[0].spO2.value,
     hr: qcl_json_data.records[0].pulseRate.value
   }
