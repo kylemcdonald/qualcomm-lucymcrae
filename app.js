@@ -62,7 +62,11 @@ app.get('/get/raw', function (req, res) {
 });
 
 app.get('/get/sessions', function (req, res) {
-  sessionsCollection.find().toArray(function(err, result) {
+  var query = {};
+  if(req.query.serial) {
+    query.serial = req.query.serial;
+  }
+  sessionsCollection.find(query).toArray(function(err, result) {
     if(err) return res.sendStatus(500);
     res.json(result);
   });
