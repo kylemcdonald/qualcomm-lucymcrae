@@ -6,7 +6,9 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-var rawCollection, dataCollection;
+var rawCollection,
+  dataCollection,
+  sessionsCollection;
 
 app.use(cors());
 app.use(express.static('public'));
@@ -45,10 +47,24 @@ app.post('/add', function (req, res) {
   add(req.body, res);
 });
 
+app.post('/add/session', function (req, res) {
+  var data = req.body;
+  sessionsCollection.insert(data, function(err, result) {
+    res.sendStatus(err ? 500 : 200);
+  });
+});
+
 app.get('/get/raw', function (req, res) {
   rawCollection.find().toArray(function(err, items) {
     if(err) return res.sendStatus(500);
     res.json(items);
+  });
+});
+
+app.get('/get/sessions', function (req, res) {
+  sessionsCollection.find().toArray(function(err, result) {
+    if(err) return res.sendStatus(500);
+    res.json(result);
   });
 });
 
@@ -75,6 +91,7 @@ MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
   console.log('Connected to database.');
   rawCollection = db.collection('raw');
   dataCollection = db.collection('data');
+  sessionsCollection = db.collection('sessions');
 
   server.listen(process.env.PORT, function () {
     var host = server.address().address;
