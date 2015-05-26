@@ -22,8 +22,23 @@ io.on('connection', function (socket) {
   });
 });
 
-function add(raw, res) {
-  console.log(raw);
+app.get('/add', function (req, res) {
+  var data = {
+    serial: req.query.serial,
+    time: new Date().toISOString(),
+    spo2: req.query.spo2,
+    hr: req.query.hr,
+  }
+  console.log(data);
+  dataCollection.insert(data, function(err, result) {
+    if(err) console.log(err);
+    res.sendStatus(err ? 500 : 200);
+    io.sockets.emit('update', data);
+  })
+});
+
+app.post('/add', function (req, res) {
+  var raw = req.body;
   var qcl_json_data = JSON.parse(raw.qcl_json_data);
   var data = {
     serial: raw.device_serial_number,
@@ -31,20 +46,15 @@ function add(raw, res) {
     spo2: qcl_json_data.records[0].spO2.value,
     hr: qcl_json_data.records[0].pulseRate.value
   }
+  console.log(data);
   dataCollection.insert(data, function(err1, result) {
+    if(err1) console.log(err1);
     rawCollection.insert(raw, function(err2, result) {
+      if(err2) console.log(err2);
       res.sendStatus((err1 || err2) ? 500 : 200);
       io.sockets.emit('update', data);     
     })
   })
-}
-
-app.get('/add', function (req, res) {
-  add(req.query, res);
-});
-
-app.post('/add', function (req, res) {
-  add(req.body, res);
 });
 
 app.post('/add/session', function (req, res) {
