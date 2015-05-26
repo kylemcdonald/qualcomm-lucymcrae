@@ -59,9 +59,11 @@ app.post('/add', function (req, res) {
 
 app.post('/add/session', function (req, res) {
   var data = req.body;
-  sessionsCollection.insert(data, function(err, result) {
-    res.sendStatus(err ? 500 : 200);
-  });
+  if(data.begin && data.end) {
+    sessionsCollection.insert(data, function(err, result) {
+      res.sendStatus(err ? 500 : 200);
+    });
+  }
 });
 
 app.get('/get/raw', function (req, res) {
