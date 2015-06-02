@@ -1,6 +1,7 @@
 var MongoClient = require('mongodb').MongoClient;
 var bodyParser = require('body-parser');
 var cors = require('cors');
+var json2csv = require('json2csv');
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);
@@ -74,13 +75,40 @@ app.get('/get/raw', function (req, res) {
 });
 
 app.get('/get/sessions', function (req, res) {
-  sessionsCollection.find().toArray(function(err, result) {
+  sessionsCollection.find().toArray(function(err, data) {
     if(err) return res.sendStatus(500);
-    res.json(result);
+    res.json(data);
   });
 });
 
-app.get('/get/data', function (req, res) {
+app.get('/get/sessions.csv', function(req, res) {
+  sessionsCollection.find().toArray(function(err, data) {
+    if(err) return res.sendStatus(500);
+    data = data.map(function(obj) {
+      return {
+        serial: obj.begin.serial,
+        begin_time: obj.begin.time,
+        begin_timestamp: new Date(obj.begin.time).getTime(),
+        end_time: obj.end.time,
+        end_timestamp: new Date(obj.end.time).getTime(),
+        begin_spo2: obj.begin.spo2,
+        end_spo2: obj.end.spo2,
+        begin_hr: obj.begin.hr,
+        end_hr: obj.end.hr
+      }
+    })
+    json2csv({data: data,
+      fields: ['serial', 'begin_time', 'begin_timestamp', 'end_time', 'end_timestamp', 'begin_spo2', 'end_spo2', 'begin_hr', 'end_hr'],
+      fieldNames: ['Serial', 'Begin Time', 'Begin Timestamp', 'End Time', 'End Timestamp', 'Begin SpO2', 'End SpO2', 'Begin Heart Rate', 'End Heart Rate']
+    }, function(err, csv) {
+      res.attachment('sessions.csv');
+      res.set('Content-type', 'text/csv');
+      res.send(csv);
+    })
+  })
+})
+
+function getData(req, res, cb) {
   var limit = req.query.limit;
   var query = {};
   if(req.query.serial) {
@@ -94,9 +122,37 @@ app.get('/get/data', function (req, res) {
     if(limit) {
       items = items.slice(0, limit);
     }
-    res.json(items);
-  });
+    cb(items);
+  });  
+}
+
+app.get('/get/data', function (req, res) {
+  getData(req, res, function(data) {
+    res.json(data);
+  })
 });
+
+app.get('/get/data.csv', function(req, res) {
+  getData(req, res, function(data) {
+    data = data.map(function(obj) {
+      return {
+        serial: obj.serial,
+        time: obj.time,
+        timestamp: new Date(obj.time).getTime(),
+        spo2: obj.spo2,
+        hr: obj.hr,
+      }
+    })
+    json2csv({data: data,
+      fields: ['time', 'timestamp', 'serial', 'spo2', 'hr'],
+      fieldNames: ['Time', 'Timestamp', 'Serial', 'SpO2', 'Heart Rate']
+    }, function(err, csv) {
+      res.attachment('data.csv');
+      res.set('Content-type', 'text/csv');
+      res.send(csv);
+    })
+  })
+})
 
 MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
   if(err) { return console.dir(err); }
